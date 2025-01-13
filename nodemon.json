@@ -1,0 +1,7 @@
+{
+  "env": {
+    "MONGO_USER": "rebelthyworld",
+    "MONGO_PASSWORD": "Forgot@2692_",
+    "MONGO_DEFAULT_DATABASE": "shopDb"
+  }
+}
