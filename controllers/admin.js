@@ -1,5 +1,4 @@
 const Product = require('../models/product');
-
 const { ObjectId } = require('mongodb');
 const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
