@@ -1,5 +1,6 @@
 const Product = require('../models/product');
-const {ObjectId} = require('mongodb');
+
+const { ObjectId } = require('mongodb');
 const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
 const fileHelper = require('../util/file');
@@ -13,17 +14,17 @@ exports.getAddProduct = (req, res, next) => {
     errorMessage: null,
     validationErrors: [],
     // isAuthenticated: req.session.isLoggedIn,
-  })
+  });
 };
 
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title.trim();
-  
+
   const image = req.file;
   const price = Number(req.body.price.trim());
   const description = req.body.description.trim();
   const errors = validationResult(req);
-  if(!image) {
+  if (!image) {
     return res.status(422).render('admin/edit-product', {
       pageTitle: 'Add Product',
       path: '/admin/add-product',
@@ -54,7 +55,7 @@ exports.postAddProduct = (req, res, next) => {
       validationErrors: errors.array(),
     });
   }
-  const imageUrl = image.path
+  const imageUrl = image.path;
   const product = new Product({
     title: title,
     price: price,
@@ -63,16 +64,16 @@ exports.postAddProduct = (req, res, next) => {
     userId: req.user,
   });
   product
-  .save()
-  .then(result=>{
-    res.redirect('/admin/products');
-  })
-  .catch(err=>{
-    console.log(err);
-    const error= new Error(err);
-    error.httpStatusCode = 500;
-    return next(error);
-  });
+    .save()
+    .then((result) => {
+      res.redirect('/admin/products');
+    })
+    .catch((err) => {
+      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 //mongoose
@@ -84,25 +85,25 @@ exports.getEditProduct = (req, res, next) => {
   const prodId = req.params.productId;
 
   Product.findById(prodId)
-  .then(product=> {
-    if (!product) {
-      return res.redirect('/');
-    }
-    res.render('admin/edit-product', {
-      pageTitle: 'Edit Product',
-      path: '/admin/edit-product',
-      editing: editMode,
-      product: product,
-      hasError: false,
-      errorMessage: null,
-      validationErrors: [],
+    .then((product) => {
+      if (!product) {
+        return res.redirect('/');
+      }
+      res.render('admin/edit-product', {
+        pageTitle: 'Edit Product',
+        path: '/admin/edit-product',
+        editing: editMode,
+        product: product,
+        hasError: false,
+        errorMessage: null,
+        validationErrors: [],
+      });
+    })
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
-  })
-  .catch(err=>{
-    const error= new Error(err);
-    error.httpStatusCode = 500;
-    return next(error);
-  });
 };
 
 //mongoose
@@ -136,65 +137,63 @@ exports.postEditProduct = (req, res, next) => {
   }
 
   Product.findById(prodId)
-  .then(product=> {
-    if (product.userId.toString() !== req.user._id.toString()) {
-      return res.redirect('/');
-    }
-    product.title=updatedTitle;
-    product.price=updatedPrice;
-    product.description=updatedDesc;
-    if (image) {
-      product.imageUrl= image.path;
-      fileHelper.deleteFile(product.imageUrl);
-    }
-    
-    return product
-    .save()
-    .then(result=>{
-      res.redirect('/admin/products');
+    .then((product) => {
+      if (product.userId.toString() !== req.user._id.toString()) {
+        return res.redirect('/');
+      }
+      product.title = updatedTitle;
+      product.price = updatedPrice;
+      product.description = updatedDesc;
+      if (image) {
+        product.imageUrl = image.path;
+        fileHelper.deleteFile(product.imageUrl);
+      }
+
+      return product.save().then((result) => {
+        res.redirect('/admin/products');
+      });
     })
-  })
-  .catch(err=>{
-    const error= new Error(err);
-    error.httpStatusCode = 500;
-    return next(error);
-  });
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 //mongoose
 exports.getProducts = (req, res, next) => {
-  Product.find({userId: req.user._id})
-  // .populate('userId')
-  .then(products=> {
-    res.render('admin/products', {
-      prods: products,
-      pageTitle: 'Admin Products',
-      path: '/admin/products',
+  Product.find({ userId: req.user._id })
+    // .populate('userId')
+    .then((products) => {
+      res.render('admin/products', {
+        prods: products,
+        pageTitle: 'Admin Products',
+        path: '/admin/products',
+      });
+    })
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
-  })
-  .catch(err=>{
-    const error= new Error(err);
-    error.httpStatusCode = 500;
-    return next(error);
-  });
 };
 
 //mongoose
 exports.deleteProduct = (req, res, next) => {
   const prodId = req.params.productId;
   Product.findById(prodId)
-  .then(product => {
-    if (!product) {
-      return next(new Error('Product not found'));
-    }
-    fileHelper.deleteFile(product.imageUrl);
-    return Product.deleteOne({_id: prodId, userId: req.user._id})
-  })
-  .then(()=> {
-    console.log('DESTROYED PRODUCT');
-    res.status(200).json({message: 'Success!'});
-  })
-  .catch(err=>{
-    res.status(500).json({message: 'Deleting product failed.'})
-  });
+    .then((product) => {
+      if (!product) {
+        return next(new Error('Product not found'));
+      }
+      fileHelper.deleteFile(product.imageUrl);
+      return Product.deleteOne({ _id: prodId, userId: req.user._id });
+    })
+    .then(() => {
+      console.log('DESTROYED PRODUCT');
+      res.status(200).json({ message: 'Success!' });
+    })
+    .catch((err) => {
+      res.status(500).json({ message: 'Deleting product failed.' });
+    });
 };
