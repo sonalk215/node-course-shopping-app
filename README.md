@@ -11,6 +11,7 @@ Shopping app using ExpressJs.
 
 
 ## **How to use**
+* User needs a MongoDb account for the database connection, and in app.js use your own user passwords
 * Clone the project from my GitHub account
 * Change directory into the project folder
 * Install all node packages
