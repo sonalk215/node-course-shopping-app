@@ -17,7 +17,7 @@ Shopping app using ExpressJs.
 * Start the local server
 
 FROM TERMINAL
-* git clone https://github.com/sonalk215/node-course-shopping-app.git
+* git clone https://github.com/sonalk215/node-shopping-app.git
 * cd node-course-shopping-app
 * npm install
 * npm start
